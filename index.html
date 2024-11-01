@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrabble Checker Embed</title>
+    <title>Avatar Selector with Persistence</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* Style to make the iframe take full width and height minus the footer */
         body, html {
             margin: 0;
             padding: 0;
@@ -13,43 +13,189 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            
-            
+            overflow: hidden;
         }
-        iframe {
-            flex: 1;
-            width: 100%;
-            border: none;
-        }
-        footer {
+        header {
             display: flex;
-            align-items: center; /* Center align items vertically */
-            justify-content: center; /* Center align items horizontally */
-            padding: 5px;
+            align-items: center;
+            padding: 10px;
             background-color: #f1f1f1;
-            font-size: 14px;
+            font-size: 16px;
             color: #333;
         }
-        .footer-image {
-            width: 30px; /* Set the width of the image */
-            height: 30px; /* Set the height of the image */
-            border-radius: 50%; /* Make the image round */
-            margin-right: 10px; /* Space between image and text */
+        .logo {
+            width: 40px;
+            height: auto;
+            border-radius: 50%;
+            cursor: pointer;
         }
-        .footer-link {
-            color: #333; /* Text color */
-            text-decoration: none; /* Remove underline */
+        .menu-button {
+            background-color: transparent;
+            border: none;
+            color: #007bff;
+            font-size: 24px;
+            margin-left: auto;
+            cursor: pointer;
         }
-        .footer-link:hover {
-            text-decoration: underline; /* Underline on hover */
+        .sidebar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .sidebar.active {
+            display: block;
+        }
+        h2{
+          font-size:18px;
+      margin-bottom:20px;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 500;
+        }
+        .overlay.active {
+            display: block;
+        }
+        .avatar {
+            width: 60px; /* Set avatar selection size to 60px */
+            height: 60px;
+            border-radius: 50%;
+            margin: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border 0.2s;
+        }
+        .avatar.selected {
+            border: 2px solid #007bff;
+        }
+        .sidebar-footer {
+           position:absolute;
+           bottom:10px;
+           left:0;
+           right:0;
+           padding:10px;
+           border-top:solid 1px grey;
+            margin-top: auto; /* Push footer to the bottom */
+            display: flex; /* Use flexbox for inline elements */
+            align-items: center; /* Center items vertically */
+             font-size:15px; 
+        }
+        .footer-img {
+            width: 30px; /* Set the size of the profile picture */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 50%; /* Make it circular */
+            margin-right: 10px; /* Space between image and name */
         }
     </style>
 </head>
 <body>
-    <iframe src="https://scrabblecheck.com/" title="Scrabble Checker"></iframe>
-    <footer>
-        <img class="footer-image" src="https://lh3.googleusercontent.com/a/ACg8ocIlsgLjvhRSiiacjJ16nQng_Ta7novQZgIxZevCWL9_XT1mu9U=s864-c-no" alt="Engr. Ariel O. Mentawan">
-        <span>Designed by: <a class="footer-link" href="https://www.facebook.com/acohcayeng?mibextid=ZbWKwL" target="_blank"><u>Engr. Ariel O. Mentawan</u></a></span>
-    </footer>
+    <header>
+        <img id="currentAvatar" class="logo" src="https://cdn-icons-png.flaticon.com/128/3177/3177440.png" alt="Avatar" onclick="openAvatarModal()">
+        <h1 style="margin-left: 10px; font-size: 18px;">Scrabble Word Checker</h1>
+        <button class="menu-button" onclick="toggleSidebar()">&#9776;</button>
+    </header>
+    <div class="sidebar" id="sidebar">
+        <h2>More Service</h2>
+        <p>Soon</p>
+        <p>Soon</p>
+        <p>Soon</p>
+
+        <div class="sidebar-footer">
+            <img src="https://lh3.googleusercontent.com/a/ACg8ocIlsgLjvhRSiiacjJ16nQng_Ta7novQZgIxZevCWL9_XT1mu9U=s864-c-no" alt="Profile Pic" class="footer-img">
+            <p style="margin: 0;">Designed by <br/> Engr. Ariel O. Mentawan</p> <!-- Your name in the footer -->
+        </div>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="modal" id="avatarModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select an Avatar</h5>
+                    <button type="button" class="close" onclick="closeAvatarModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="avatarSelection">
+                    <img src="https://cdn-icons-png.flaticon.com/128/4140/4140037.png" alt="Avatar 1" class="avatar" onclick="selectAvatar('https://cdn-icons-png.flaticon.com/128/4140/4140037.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/128/2202/2202112.png" alt="Avatar 2" class="avatar" onclick="selectAvatar('https://cdn-icons-png.flaticon.com/128/2202/2202112.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/128/4140/4140047.png" alt="Avatar 3" class="avatar" onclick="selectAvatar('https://cdn-icons-png.flaticon.com/128/4140/4140047.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/128/4140/4140048.png" alt="Avatar 4" class="avatar" onclick="selectAvatar('https://cdn-icons-png.flaticon.com/128/4140/4140048.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/128/1999/1999625.png" alt="Avatar 5" class="avatar" onclick="selectAvatar('https://cdn-icons-png.flaticon.com/128/1999/1999625.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/128/11498/11498793.png" alt="Avatar 6" class="avatar" onclick="selectAvatar('https://cdn-icons-png.flaticon.com/128/11498/11498793.png')">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeAvatarModal()">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAvatar()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <iframe src="https://scrabblecheck.com/" title="Scrabble Checker" style="flex: 1; width: 100%; border: none;"></iframe>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let selectedAvatar = '';
+
+        function loadAvatar() {
+            const cookieValue = document.cookie.split('; ').find(row => row.startsWith('avatar='));
+            if (cookieValue) {
+                const avatar = cookieValue.split('=')[1];
+                document.getElementById('currentAvatar').src = decodeURIComponent(avatar);
+            } else {
+                document.getElementById('currentAvatar').src = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png";
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function openAvatarModal() {
+            $('#avatarModal').modal('show');
+        }
+
+        function closeAvatarModal() {
+            $('#avatarModal').modal('hide');
+        }
+
+        function selectAvatar(avatarUrl) {
+            selectedAvatar = avatarUrl;
+            document.getElementById('currentAvatar').src = avatarUrl;
+
+            const avatars = document.querySelectorAll('.avatar');
+            avatars.forEach(avatar => {
+                avatar.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function saveAvatar() {
+            if (selectedAvatar) {
+                document.cookie = "avatar=" + encodeURIComponent(selectedAvatar) + "; path=/; max-age=" + 60 * 60 * 24 * 30; // Save for 30 days
+                closeAvatarModal();
+            }
+        }
+
+        window.onload = loadAvatar; // Load avatar when the page loads
+    </script>
 </body>
 </html>
